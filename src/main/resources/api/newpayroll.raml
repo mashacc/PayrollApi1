@@ -1,0 +1,81 @@
+#%RAML 1.0
+title: Payroll API
+version: v1
+mediaType: [ application/json, application/csv ]
+
+/employees:
+  get:
+    description: Fetch all employees from the database.
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              [
+                { "emp_id": 1, "name": "Alice Johnson", "department": "Engineering", "base_salary": 6500.00 },
+                { "emp_id": 2, "name": "Bob Smith", "department": "Finance", "base_salary": 5500.00 },
+                { "emp_id": 3, "name": "Carol White", "department": "HR", "base_salary": 4800.00 },
+                { "emp_id": 4, "name": "David Green", "department": "Marketing", "base_salary": 6000.00 },
+                { "emp_id": 5, "name": "Eva Brown", "department": "IT", "base_salary": 4700.00 }
+              ]
+      500:
+        body:
+          application/json:
+            example:
+              { "errorCode": "500", "errorMessage": "Database query failed" }
+
+/payroll:
+  post:
+    description: Process payroll for one or multiple employees. Accepts list of emp_id + month.
+    body:
+      application/json:
+        example: 
+          {
+            "employees": [
+              { "emp_id": 1, "month": "2025-09" },
+              { "emp_id": 3, "month": "2025-09" }
+            ]
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              [
+                { "emp_id": 1, "name": "Alice Johnson", "gross_salary": 6500.00, "tax_amount": 975.00, "net_salary": 5525.00, "month": "2025-09" },
+                { "emp_id": 3, "name": "Carol White", "gross_salary": 4800.00, "tax_amount": 480.00, "net_salary": 4320.00, "month": "2025-09" }
+              ]
+      400:
+        body:
+          application/json:
+            example:
+              { "errorCode": "400", "errorMessage": "Invalid request body" }
+
+/reports/{month}:
+  description: Download payroll report for a given month (CSV or JSON).
+  uriParameters:
+    month:
+      description: Payroll month (format YYYY-MM or name)
+      type: string
+      example: "2025-09"
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "month": "2025-09",
+                "transactions": [
+                  { "txn_id": 1, "emp_id": 1, "gross_salary": 6500.00, "tax_amount": 975.00, "net_salary": 5525.00, "processed_at": "2025-09-30T23:59:00Z" }
+                ]
+              }
+          application/csv:
+            example: |
+              txn_id,emp_id,name,gross_salary,tax_amount,net_salary,processed_at
+              1,1,Alice Johnson,6500.00,975.00,5525.00,2025-09-30T23:59:00Z
+      404:
+        body:
+          application/json:
+            example:
+              { "errorCode": "404", "errorMessage": "No transactions found for month" }
