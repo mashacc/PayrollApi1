@@ -3,6 +3,9 @@ title: Payroll API
 version: v1
 mediaType: [ application/json, application/csv ]
 
+
+
+
 /employees:
   get:
     description: Fetch all employees from the database.
@@ -18,12 +21,38 @@ mediaType: [ application/json, application/csv ]
                 { "emp_id": 4, "name": "David Green", "department": "Marketing", "base_salary": 6000.00 },
                 { "emp_id": 5, "name": "Eva Brown", "department": "IT", "base_salary": 4700.00 }
               ]
+      
       500:
         body:
           application/json:
             example:
               { "errorCode": "500", "errorMessage": "Database query failed" }
-
+              
+/employees/{emp_id}:
+  get:
+    description: Fetch all employees from the database.
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              [
+                { "emp_id": 1, "name": "Alice Johnson", "department": "Engineering", "base_salary": 6500.00 },
+                { "emp_id": 2, "name": "Bob Smith", "department": "Finance", "base_salary": 5500.00 },
+                { "emp_id": 3, "name": "Carol White", "department": "HR", "base_salary": 4800.00 },
+                { "emp_id": 4, "name": "David Green", "department": "Marketing", "base_salary": 6000.00 },
+                { "emp_id": 5, "name": "Eva Brown", "department": "IT", "base_salary": 4700.00 }
+              ]
+      400:
+        body:
+          application/json:
+            example:
+              { "errorCode": "400", "errorMessage": "Invalid request body" }
+      500:
+        body:
+          application/json:
+            example:
+              { "errorCode": "500", "errorMessage": "Database query failed" }
 /payroll:
   post:
     description: Process payroll for one or multiple employees. Accepts list of emp_id + month.
