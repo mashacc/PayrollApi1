@@ -5,6 +5,12 @@
     },
     "064f0ea5-a8ab-41fd-b3c0-0a40f6031eaf": {
       "payload": "sample_data/list_java_1.dwl"
+    },
+    "28862cee-46b0-4737-a3b6-24d8b757696d": {
+      "payload": "sample_data/list_java_2.dwl"
+    },
+    "b40cf708-5697-44a2-a4b2-43055e13db02": {
+      "payload": "sample_data/list_java_3.dwl"
     }
   }
 }
