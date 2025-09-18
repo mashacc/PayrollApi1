@@ -4,10 +4,10 @@
     <db:config name="Database_Config" doc:name="Database Config" doc:id="2af93c77-72bf-485f-ae7b-a04b2e74a61c">
         <db:my-sql-connection host="localhost" port="3306" user="root" password="root" />
     </db:config>
-    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="af4ba42e-42ce-4dc9-8db2-f24cf5c71766" >
-		<http:listener-connection host="0.0.0.0" port="8081" />
-	</http:listener-config>
-	<flow name="newpayroll-main">
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="af4ba42e-42ce-4dc9-8db2-f24cf5c71766">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <flow name="newpayroll-main">
         <http:listener path="/api/*" config-ref="HTTP_Listener_config">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
@@ -100,7 +100,7 @@ output application/json
         </error-handler>
     </flow>
     <flow name="newpayroll-console">
-        <http:listener path="/console/*">
+        <http:listener path="/console/*" config-ref="HTTP_Listener_config">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
@@ -129,16 +129,16 @@ output application/json
     <flow name="get:\employees\:newpayroll-config">
         <logger level="INFO" doc:name="Logger" doc:id="6b0a89cf-f266-4323-87e0-27ace3b76d9a" message="FlowStart" />
         <db:select doc:name="Select" doc:id="349c331c-0264-4a9e-8288-35e7161526a5" config-ref="Database_Config">
-			<db:sql ><![CDATA[SELECT * FROM payroll_db.employees;]]></db:sql>
-		</db:select>
-		<ee:transform doc:name="Transform Message" doc:id="064f0ea5-a8ab-41fd-b3c0-0a40f6031eaf">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
+            <db:sql><![CDATA[SELECT * FROM payroll_db.employees;]]></db:sql>
+        </db:select>
+		<ee:transform doc:name="Transform Message" doc:id="5305e16b-aaa6-46a1-b58b-f54b57ca2f8c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
 ---
-payload ]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
     </flow>
     <flow name="get:\employees\(emp_id):newpayroll-config">
         <ee:transform doc:name="Transform Message">
@@ -161,7 +161,7 @@ payload]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
-	<flow name="get:\reports\(month):newpayroll-config">
+    <flow name="get:\reports\(month):newpayroll-config">
         <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="month">attributes.uriParams.'month'</ee:set-variable>
@@ -188,7 +188,7 @@ output application/json
             </ee:message>
         </ee:transform>
     </flow>
-	<flow name="post:\payroll:application\json:newpayroll-config">
+    <flow name="post:\payroll:application\json:newpayroll-config">
         <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -210,6 +210,47 @@ output application/json
     tax_amount: 480,
     net_salary: 4320,
     month: "2025-09"
+  }
+] as Array {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\employees:newpayroll-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[
+  {
+    emp_id: 1,
+    name: "Alice Johnson",
+    department: "Engineering",
+    base_salary: 6500
+  }, 
+  {
+    emp_id: 2,
+    name: "Bob Smith",
+    department: "Finance",
+    base_salary: 5500
+  }, 
+  {
+    emp_id: 3,
+    name: "Carol White",
+    department: "HR",
+    base_salary: 4800
+  }, 
+  {
+    emp_id: 4,
+    name: "David Green",
+    department: "Marketing",
+    base_salary: 6000
+  }, 
+  {
+    emp_id: 5,
+    name: "Eva Brown",
+    department: "IT",
+    base_salary: 4700
   }
 ] as Array {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
             </ee:message>
